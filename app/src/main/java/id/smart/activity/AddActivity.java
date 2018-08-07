@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -12,14 +13,17 @@ import android.widget.Toast;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.util.Calendar;
 import java.util.List;
 
 import id.smart.R;
 import id.smart.config.Config;
 import id.smart.model.KartuKeluargaModel;
 
-public class AddActivity extends AppCompatActivity implements Validator.ValidationListener {
+public class AddActivity extends AppCompatActivity implements Validator.ValidationListener,
+        DatePickerDialog.OnDateSetListener {
 
     @NotEmpty
     private TextInputEditText etNIK;
@@ -49,6 +53,7 @@ public class AddActivity extends AppCompatActivity implements Validator.Validati
     private Validator validator;
     private ProgressDialog pDialog;
     private String menu;
+    Calendar now = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +100,16 @@ public class AddActivity extends AppCompatActivity implements Validator.Validati
         });
     }
 
+    public void setTanggal(View v) {
+        DatePickerDialog dpd = DatePickerDialog.newInstance(
+                this,
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        dpd.show(getFragmentManager(), "Datepickerdialog");
+    }
+
     @Override
     public void onValidationSucceeded() {
         //Sukses
@@ -134,8 +149,39 @@ public class AddActivity extends AppCompatActivity implements Validator.Validati
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == android.R.id.home) {
+            onBackPressed();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        now.set(Calendar.YEAR,year);
+        now.set(Calendar.MONTH,monthOfYear);
+        now.set(Calendar.DATE,dayOfMonth);
+
+        String date = ""+dayOfMonth;
+        String month = ""+monthOfYear;
+
+        if(dayOfMonth<10) {
+            date = "0"+dayOfMonth;
+        }
+        if(monthOfYear<10) {
+            month = "0"+monthOfYear;
+        }
+
+        etTTL.setText(year+"-"+month+"-"+date);
     }
 }

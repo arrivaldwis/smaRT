@@ -40,4 +40,13 @@
         </menu>
     </item>
 
+    <item android:title="Others">
+        <menu>
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/ic_exit_to_app_black_24dp"
+                android:title="Logout" />
+        </menu>
+    </item>
+
 </menu>

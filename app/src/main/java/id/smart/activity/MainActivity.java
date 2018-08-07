@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,13 +22,16 @@ import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import id.smart.R;
 import id.smart.config.Config;
+import id.smart.model.AcaraModel;
 import id.smart.model.SlideshowModel;
+import id.smart.model.UserModel;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -35,6 +39,7 @@ public class MainActivity extends AppCompatActivity
 
     private SliderLayout mSlider;
     private TextView tvDescription;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,43 @@ public class MainActivity extends AppCompatActivity
 
         mSlider = (SliderLayout)findViewById(R.id.slider);
         tvDescription = (TextView) findViewById(R.id.tvDescription);
+        mAuth = FirebaseAuth.getInstance();
+
+        if(mAuth.getCurrentUser()==null) {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+        } else {
+            Config.refUser.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again
+                    // whenever data at this location is updated.
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        UserModel model = ds.getValue(UserModel.class);
+                        if(mAuth.getCurrentUser().getEmail().equals(model.getEmail())) {
+                            String email = model.getEmail();
+                            String role = model.getRole();
+                            String nama = model.getNama();
+                            Config.modelIntent = new UserModel(email, role, nama);
+                            break;
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                }
+            });
+        }
+
+        if(getIntent().getExtras()!=null) {
+            String email = getIntent().getStringExtra("email");
+            String role = getIntent().getStringExtra("role");
+            String nama = getIntent().getStringExtra("nama");
+            Config.modelIntent = new UserModel(email, role, nama);
+        }
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,22 +166,32 @@ public class MainActivity extends AppCompatActivity
             // Handle the camera action
         } else if (id == R.id.nav_find) {
             i = new Intent(MainActivity.this, FindActivity.class);
+            i.putExtra("menu", "cari");
             startActivity(i);
         } else if (id == R.id.nav_announcement) {
             i = new Intent(MainActivity.this, AnnouncementActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_critic) {
-            Toast.makeText(this, "Dalam tahap pengembangan", Toast.LENGTH_SHORT).show();
+            i = new Intent(MainActivity.this, CriticsSuggestActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_chat) {
             Toast.makeText(this, "Dalam tahap pengembangan", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_contact) {
             i = new Intent(MainActivity.this, ContactActivity.class);
             startActivity(i);
-        } else if (id == R.id.nav_add) {
-            i = new Intent(MainActivity.this, AddActivity.class);
-            i.putExtra("menu", "tambah");
+        } else if (id == R.id.logout) {
+            FirebaseAuth.getInstance().signOut();
+            i = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(i);
+            finish();
+        } else if (id == R.id.nav_add) {
+            if(Config.modelIntent.getRole().equals("ketua")) {
+                i = new Intent(MainActivity.this, AddActivity.class);
+                i.putExtra("menu", "tambah");
+                startActivity(i);
+            } else {
+                Toast.makeText(this, "This menu only for Ketua RT", Toast.LENGTH_SHORT).show();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

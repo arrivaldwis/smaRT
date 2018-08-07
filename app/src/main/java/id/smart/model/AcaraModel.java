@@ -1,12 +1,22 @@
 package id.smart.model;
 
 public class AcaraModel {
+    public String key;
     public String nama;
     public String tanggal;
 
-    public AcaraModel(String nama, String tanggal) {
+    public AcaraModel(String key, String nama, String tanggal) {
+        this.key = key;
         this.nama = nama;
         this.tanggal = tanggal;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getNama() {

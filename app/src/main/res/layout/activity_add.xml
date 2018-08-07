@@ -100,7 +100,9 @@
                         android:id="@+id/etTTL"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Tempat Tanggal Lahir" />
+                        android:hint="Tempat Tanggal Lahir"
+                        android:onClick="setTanggal"
+                        android:editable="false"/>
                 </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 

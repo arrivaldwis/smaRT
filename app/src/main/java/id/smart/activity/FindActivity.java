@@ -3,6 +3,7 @@ package id.smart.activity;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -80,6 +81,7 @@ public class FindActivity extends AppCompatActivity {
         etNoPanggilan = findViewById(R.id.etNamaPanggilan);
         btnSearch = findViewById(R.id.btnSearch);
         rlDelete = findViewById(R.id.rlDelete);
+        rlDelete.setVisibility(View.GONE);
 
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +103,7 @@ public class FindActivity extends AppCompatActivity {
                     if (!etNIK.getText().toString().isEmpty()) {
                         if (model.getNik().equals(etNIK.getText().toString())) {
                             resultData(model);
+                            checkRole();
                             break;
                         }
                     }
@@ -108,6 +111,7 @@ public class FindActivity extends AppCompatActivity {
                     if (!etNoKK.getText().toString().isEmpty()) {
                         if (model.getNo_kk().equals(etNoKK.getText().toString())) {
                             resultData(model);
+                            checkRole();
                             break;
                         }
                     }
@@ -115,6 +119,7 @@ public class FindActivity extends AppCompatActivity {
                     if (model.getNama().contains(etNama.getText().toString()) ||
                             model.getNama_panggilan().contains(etNoPanggilan.getText().toString())) {
                         resultData(model);
+                        checkRole();
                         break;
                     }
 
@@ -127,6 +132,12 @@ public class FindActivity extends AppCompatActivity {
                 // Failed to read value
             }
         });
+    }
+
+    private void checkRole() {
+        if(Config.modelIntent.getRole().equals("ketua")) {
+            rlDelete.setVisibility(View.VISIBLE);
+        }
     }
 
     private void resultData(KartuKeluargaModel model) {
@@ -147,5 +158,17 @@ public class FindActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == android.R.id.home) {
+            onBackPressed();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
