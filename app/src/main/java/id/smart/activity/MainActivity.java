@@ -165,8 +165,18 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             // Handle the camera action
         } else if (id == R.id.nav_find) {
-            i = new Intent(MainActivity.this, FindActivity.class);
-            i.putExtra("menu", "cari");
+            if(Config.modelIntent.getRole()!=null) {
+                if (Config.modelIntent.getRole().equals("ketua")) {
+                    i = new Intent(MainActivity.this, FindActivity.class);
+                    i.putExtra("menu", "cari");
+                } else {
+                    i = new Intent(MainActivity.this, FindWargaActivity.class);
+                    i.putExtra("menu", "cari");
+                }
+            } else {
+                i = new Intent(MainActivity.this, FindWargaActivity.class);
+                i.putExtra("menu", "cari");
+            }
             startActivity(i);
         } else if (id == R.id.nav_announcement) {
             i = new Intent(MainActivity.this, AnnouncementActivity.class);
@@ -185,12 +195,14 @@ public class MainActivity extends AppCompatActivity
             startActivity(i);
             finish();
         } else if (id == R.id.nav_add) {
-            if(Config.modelIntent.getRole().equals("ketua")) {
-                i = new Intent(MainActivity.this, AddActivity.class);
-                i.putExtra("menu", "tambah");
-                startActivity(i);
-            } else {
-                Toast.makeText(this, "This menu only for Ketua RT", Toast.LENGTH_SHORT).show();
+            if(Config.modelIntent.getRole()!=null) {
+                if (Config.modelIntent.getRole().equals("ketua")) {
+                    i = new Intent(MainActivity.this, AddActivity.class);
+                    i.putExtra("menu", "tambah");
+                    startActivity(i);
+                } else {
+                    Toast.makeText(this, "This menu only for Ketua RT", Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
